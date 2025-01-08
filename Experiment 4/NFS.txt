@@ -1,0 +1,122 @@
+
+
+**Servers:**
+
+**File Sharing Servers:**
+
+1. **NFS (Network File System)**  
+   - These servers are used in LAN.
+   
+2. **FTP (File Transfer Protocol)**  
+   - These servers are used in WAN & LAN.
+
+3. **Samba Server**  
+   - These servers are used in Linux & Windows heterogeneous networks.
+
+**Note:**
+1. NFS is used in LAN because the bandwidth for NFS is higher compared to FTP and Samba.
+2. FTP is used in WAN because it requires very less bandwidth when compared to NFS.
+
+---
+
+**NFS (Network File System):**
+
+**Configuration Steps:**
+
+1. Copy all the shared files to a single location:  
+   `/nfsshare`  
+   Files: aa, bb, cc
+
+2. Create new files inside the share directory:  
+   Files: aa, bb, cc
+
+3. **Packages:**
+   - i) **nfs-utils**: to install or uninstall the nfs-utils package.
+   - ii) **portmap**: (please do not uninstall portmap).
+
+4. **Services:**
+   - nfs  
+   - portmap
+
+5. **Daemons:**
+   - nfsd  
+   - quotad  
+   - mountd
+
+6. **Main Configuration File:**  
+   `/etc/exports`
+
+---
+
+**Experiment:**
+
+1. Make a directory named nfsshare with files aa, bb, cc:
+   ```bash
+   # mkdir /nfsshare
+   # cd /nfsshare
+   # touch aa bb cc
+   # ls
+   aa bb cc
+   ```
+
+2. Check if the nfs-utils package is installed or not:
+   ```bash
+   # rpm -q nfs-utils (Prints a message whether the package is installed or not)
+   # rpm -q portmap
+   ```
+
+3. To reinstall the package, first remove it with the following commands:
+   ```bash
+   # services nfs stop
+   # rpm -e nfs-utils
+   # rm -rf /var/lib/nfs/xtab   (Remove)
+   ```
+
+4. If the package is not installed, there are two ways to install it:
+   - **Install from FTP:**
+     ```bash
+     # ping the server
+     # rpm -ivh ftp://192.168.0.250:/pub.RedHat/RPMS/nfs* --force --aid
+     ```
+   - **Install from CD:**
+     ```bash
+     # mount /dev/cdrom /mnt
+     # cd /mnt
+     # ls
+     # cd Fedora
+     # cd RPMS
+     # rpm -ivh nfs-utils* --force --aid
+     # rpm -ivh portmap* --force --aid
+     ```
+
+5. After installing the nfs-utils package, create the file as below:
+   ```bash
+   # vi /etc/exports
+   /var/ftp/pub 192.168.0.0./24(ro,sync)
+   /nfsshare 192.168.0.0./24(rw,sync)
+   ```
+   Note: In vi-editor, write this content: (/nfsshare server IP address and number of systems connected in the network).
+
+6. After installing the services, enter the command to restart:
+   ```bash
+   # services nfs restart
+   ```
+   Note: Execute this command twice because the first time it will show "failed" and the second time it will show "ok".
+
+7. Access to NFS share from the client:
+   ```bash
+   # mount -t nfs 10.10.12.114:/nfsshare /mnt
+   ```
+   Note: In the client machine, enter the server IP address.
+
+---
+
+**Notes:**
+1. `# ping 192.168.0.3 -b` broadcasts the address in the network only.
+2. `# ssh 192.168.0.8` connects the PC to another PC, just like a terminal connection in Windows.
+3. In NFS, all files and directories are by default in read-only mode.
+
+---
+
+**Common KVM Switch:**
+Using a KVM switch, a monitor, keyboard, and mouse can be connected to two computers.
